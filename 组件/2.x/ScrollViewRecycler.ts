@@ -43,8 +43,8 @@ export default class ScrollViewRecycler extends cc.Component {
     private otherNodes: { node: cc.Node, updateOpacity?: boolean }[] = [];
     private slv: cc.ScrollView;
     private managedNodes: IManagedNode[] = [];
+    private managedOpacities: { [key: string]: number } = {};
     private slvSize: cc.Size;
-    private contentSize: cc.Size;
     private slvRelativeTop: number = 0;
     private slvRelativeBottom: number = 0;
     private slvRelativeLeft: number = 0;
@@ -59,30 +59,30 @@ export default class ScrollViewRecycler extends cc.Component {
         this.slv.node.on(cc.Node.EventType.SIZE_CHANGED, () => {
             this.slvSize = this.slv.node.getContentSize();
         }, this);
-        this.contentSize = this.slv.content.getContentSize();
+        // 监听滚动节点尺寸变化
         this.slv.content.on(cc.Node.EventType.SIZE_CHANGED, () => {
-            this.contentSize = this.slv.content.getContentSize();
             this.updateManagedNodes(); //更新管理节点数组
+            this.onUpdate(true);
+            this.scheduleOnce(() => this.onUpdate(true), 3 / 60);
         }, this);
 
+        // 监听滚动节点位置变化，并刷新显示节点
+        this.slv.content.on(cc.Node.EventType.POSITION_CHANGED, () => {
+            this.onUpdate()
+        })
+
         // 获取ScrollView的滚动节点坐标
-        // let slvWorldPos = this.slv.node.convertToWorldSpaceAR(cc.Vec3.ZERO);
-        // let slvAnchor = this.slv.node.getAnchorPoint();
-        // this.slvWorldTop = slvWorldPos.y + this.slvSize.height * (1 - slvAnchor.y);
-        // this.slvWorldBottom = slvWorldPos.y - this.slvSize.height * slvAnchor.y;
-        // this.slvWorldLeft = slvWorldPos.x - this.slvSize.width * slvAnchor.x;
-        // this.slvWorldRight = slvWorldPos.x + this.slvSize.width * (1 - slvAnchor.x);
         this.lastSlvPos = this.slv.content.getPosition();
 
         // 监听滚动事件
-        this.node.on("scroll-begain", () => this.onUpdate(), this);
-        this.node.on("scrolling", () => this.onUpdate(), this);
+        // this.node.on("scroll-begain", () => this.onUpdate(), this);
+        // this.node.on("scrolling", () => this.onUpdate(), this);
         this.node.on("scroll-ended", () => this.onUpdate(true), this);
 
         // 更新管理节点数组
         this.scheduleOnce(() => {
             this.updateManagedNodes();
-            this.onUpdate();
+            this.onUpdate(true);
         }, 0.5)
     }
 
@@ -96,7 +96,6 @@ export default class ScrollViewRecycler extends cc.Component {
         if (index === -1) {
             this.otherNodes.push({ node, updateOpacity });
             this.addManagedNode(node, updateOpacity);
-            cc.log("总节点数:", this.managedNodes.length);
         }
     }
 
@@ -136,19 +135,30 @@ export default class ScrollViewRecycler extends cc.Component {
      * @param updateOpacity 是否刷新透明度，否则刷新节点active，需要确保父节点宽高未使用Layout布局
      */
     private addManagedNode(node: cc.Node, updateOpacity?: boolean) {
-        if (!node.active) return;
-        const index = this.managedNodes.findIndex(it => it.node == node);
+        if (!cc.isValid(node) || !node.active) return;
+        let nodePos = this.slv.content.convertToNodeSpaceAR(node.convertToWorldSpaceAR(cc.Vec3.ZERO));
+        let nodeBox = node.getBoundingBox();
+        let nodeAnchor = node.getAnchorPoint();
+        let index = this.managedNodes.findIndex(it => it.node == node);
         if (index === -1) {
-            let nodePos = this.slv.content.convertToNodeSpaceAR(node.convertToWorldSpaceAR(cc.Vec3.ZERO));
-            let nodeBox = node.getBoundingBox();
-            let nodeAnchor = node.getAnchorPoint();
+            let originOpacity = this.managedOpacities[node.uuid];
+            let opacity = originOpacity ?? (node.opacity || 255);
+            if (originOpacity === undefined) {
+                this.managedOpacities[node.uuid] = opacity;
+            }
+            node.opacity = opacity;
             this.managedNodes.push({
                 node: node,
                 active: node.active,
-                opacity: node.opacity,
+                opacity: opacity,
                 rect: cc.rect(nodePos.x - nodeBox.width * nodeAnchor.x, nodePos.y - nodeBox.height * nodeAnchor.y, nodeBox.width, nodeBox.height),
                 updateOpacity
             });
+        } else {
+            let item = this.managedNodes[index];
+            item.rect = cc.rect(nodePos.x - nodeBox.width * nodeAnchor.x, nodePos.y - nodeBox.height * nodeAnchor.y, nodeBox.width, nodeBox.height)
+            item.updateOpacity = updateOpacity;
+            node.opacity = item.opacity;
         }
     }
 

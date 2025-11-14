@@ -1,10 +1,10 @@
 {
   "__type__": "cc.Material",
-  "_name": "sprite-round-corner-crop-v2",
+  "_name": "sprite-radius",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
-    "__uuid__": "7c24b57e-e819-4fc9-a8d2-b06cf61b782d"
+    "__uuid__": "01d84348-8c96-4ba1-9b69-985dcbc67a13"
   },
   "_techniqueIndex": 0,
   "_techniqueData": {

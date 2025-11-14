@@ -1,0 +1,18 @@
+{
+  "__type__": "cc.Material",
+  "_name": "sprite-gray",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "bcdaa3c0-8153-4871-94f8-5e995f7ec4b9"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_GRAY": true
+      }
+    }
+  }
+}
