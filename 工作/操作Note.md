@@ -25,4 +25,4 @@ PS: 一般只需要修改google渠道的包名，Adjust应用识别码google和s
 
 # 工具使用
 
-## 工具QuickQ   用户名：meinvchen9@gmail.com  密码：Zshd181838
+## 工具QuickQ   用户名：meinvchen9@gmail.com/kakaleung352@gmail.com  密码：Zshd181838

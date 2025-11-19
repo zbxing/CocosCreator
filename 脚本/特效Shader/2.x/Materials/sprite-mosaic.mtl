@@ -1,0 +1,22 @@
+{
+  "__type__": "cc.Material",
+  "_name": "sprite-mosaic",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "481a2de4-04a8-428d-92d7-bbe6086756d3"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "props": {
+        "xBlockCount": 40,
+        "yBlockCount": 40
+      },
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_MOSAIC": true
+      }
+    }
+  }
+}

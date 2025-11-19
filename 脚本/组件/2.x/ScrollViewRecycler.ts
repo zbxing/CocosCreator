@@ -1,5 +1,6 @@
 /** 
- * ScrollView Controller, used to control the display and hiding of content nodes.
+ * ScrollView Recycler, used to control the display and hiding of content nodes.
+ * ScrollView 回收器，用于控制内容节点的显示和隐藏
  */
 
 const { ccclass, property, requireComponent } = cc._decorator;
