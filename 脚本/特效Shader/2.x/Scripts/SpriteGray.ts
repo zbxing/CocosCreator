@@ -19,6 +19,16 @@ export default class SpriteGray extends cc.Sprite {
         return this._grayPercent;
     }
 
+    private _enable: boolean = true;
+    @property({ type: cc.Boolean, tooltip: "是否启用灰化" })
+    set enable(v: boolean) {
+        this._enable = v;
+        this.updateGray();
+    }
+    get enable() {
+        return this._enable;
+    }
+
     @property({ type: [cc.Material], tooltip: "圆角材质", override: true })
     set materials(v: cc.Material[]) {
         (this as any)._materials = v;
@@ -46,6 +56,7 @@ export default class SpriteGray extends cc.Sprite {
                 // 更新材质
                 let material: cc.Material = renderComponent.getMaterial(0);
                 material.setProperty("grayLevel", grayPercent);
+                material.setProperty('enableGray', this.enable ? 1 : 0)
                 renderComponent.setMaterial(0, material);
             });
     }

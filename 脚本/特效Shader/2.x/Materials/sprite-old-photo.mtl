@@ -1,17 +1,17 @@
 {
   "__type__": "cc.Material",
-  "_name": "sprite-gray",
+  "_name": "sprite-old-photo",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
-    "__uuid__": "3d980a5a-fbff-4437-b9f7-9031fe996539"
+    "__uuid__": "f3ea8404-9c9f-44f7-b9d0-6c711846d2c7"
   },
   "_techniqueIndex": 0,
   "_techniqueData": {
     "0": {
       "defines": {
         "USE_TEXTURE": true,
-        "USE_GRAY": true
+        "USE_OLD_PHOTO": true
       }
     }
   }

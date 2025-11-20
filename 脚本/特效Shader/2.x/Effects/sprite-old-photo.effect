@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
-// 灰化特效
+// 老照片特效
 // 原理：
-// r = 0.2126 * r + 0.7152 * g + 0.0722 * b
-// g = 0.2126 * r + 0.7152 * g + 0.0722 * b
-// b = 0.2126 * r + 0.7152 * g + 0.0722 * b
+// r = 0.393 * r + 0.769 * g + 0.189 * b; 
+// g = 0.349 * r + 0.686 * g + 0.168 * b; 
+// b = 0.272 * r + 0.534 * g + 0.131 * b;
 
 CCEffect %{
   techniques:
@@ -18,11 +18,11 @@ CCEffect %{
       properties:
         texture: { value: white }
         alphaThreshold: { value: 0.5 }
-        # 灰化程度
-        grayLevel: {
+        # 老化程度
+        oldLevel: {
           value: 1.0,
           editor: {
-            tooltip: "灰化程度",
+            tooltip: "老化程度",
             range: [0.0, 1.0]
           }
         }
@@ -76,13 +76,27 @@ CCProgram fs %{
   uniform sampler2D texture;
   #endif
 
-  #if USE_GRAY
-  uniform GrayPhoto {
-    // 灰化程度
-    float grayLevel;
-    // 是否启用灰化
-    float enableGray;
+  #if USE_OLD_PHOTO
+  uniform OldPhoto {
+    // 老化程度
+    float oldLevel;
+    // 是否启用老照片特效
+    float enableOldPhoto;
   };
+
+  /**
+   * 获取老化颜色
+   * 
+   * @param color 原始颜色 
+   *
+   * @return 老化后的颜色
+   */
+  vec4 getOldPhotoColor(vec4 color) {
+    float r = 0.393 * color.r + 0.769 * color.g + 0.189 * color.b; 
+    float g = 0.349 * color.r + 0.686 * color.g + 0.168 * color.b; 
+    float b = 0.272 * color.r + 0.534 * color.g + 0.131 * color.b;
+    return vec4(r, g, b, color.a);
+  }
   #endif
 
   void main () {
@@ -99,18 +113,15 @@ CCProgram fs %{
 
     ALPHA_TEST(o);
 
-    #if USE_GRAY
+    #if USE_OLD_PHOTO
     vec4 srcColor = o;
+    vec4 oldColor = getOldPhotoColor(srcColor);
 
-    float gray = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-    vec4 grayColor = vec4(gray, gray, gray, o.a);
-
-    if (bool(enableGray)) {
-      o = srcColor + (grayColor - srcColor) * grayLevel;
+    if (bool(enableOldPhoto)) {
+      o = srcColor + (oldColor - srcColor) * oldLevel;
     } else {
       o = srcColor;
     }
-
     #endif
     gl_FragColor = o;
   }
